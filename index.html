@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ultimate Pro Obby Challenge - Professional Edition</title>
+    <style>
+        body { margin: 0; overflow: hidden; background: #0b0d17; font-family: 'Arial Black', sans-serif; touch-action: none; -webkit-user-select: none; user-select: none; }
+        
+        #name-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #0b0d17; z-index: 5000; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; color: white;
+        }
+        #user-name-input {
+            padding: 15px; font-size: 20px; border-radius: 10px; border: 2px solid #5a8cb3;
+            width: 300px; text-align: center; background: rgba(255,255,255,0.1); color: white; margin: 20px 0;
+        }
+        .start-btn { padding: 12px 40px; font-size: 18px; cursor: pointer; background: #fff; border: none; font-weight: bold; border-radius: 5px; }
+
+        #menu {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            display: none; flex-direction: column; justify-content: center;
+            align-items: center; z-index: 1000; background: #0b0d17;
+        }
+
+        h1 { color: white; font-size: 2.5rem; margin-bottom: 50px; letter-spacing: 2px; text-shadow: 0 4px 10px rgba(0,0,0,0.5); text-align: center; }
+        .options { display: flex; gap: 40px; flex-wrap: wrap; justify-content: center; }
+        .card {
+            width: 220px; height: 320px; border-radius: 50px;
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; cursor: pointer; transition: 0.3s;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+        }
+        .card:hover { transform: translateY(-10px); }
+        #boy-card { background: #5a8cb3; } 
+        #girl-card { background: #e38ca4; } 
+
+        .char-icon { width: 120px; height: 160px; position: relative; margin-bottom: 30px; pointer-events: none;}
+        .head-part { width: 70px; height: 70px; background: #ffdbac; border-radius: 20px; margin: 0 auto; position: relative; }
+        .hair-boy { width: 75px; height: 30px; background: #222; border-radius: 10px 10px 0 0; position: absolute; top: -5px; left: -2.5px; }
+        .hair-girl { width: 75px; height: 45px; background: #5c3b2e; border-radius: 25px 25px 0 0; position: absolute; top: -5px; left: -2.5px; }
+        .body-part { width: 90px; height: 70px; background: #1e63b3; border-radius: 20px 20px 10px 10px; margin: 8px auto 0; }
+        #girl-shirt { background: #d64a8a; }
+        .card h2 { color: white; font-size: 28px; font-weight: 900; margin: 0; letter-spacing: 2px; }
+
+        #mobile-controls {
+            position: fixed; bottom: 30px; left: 0; width: 100%; height: 100px;
+            z-index: 2000; display: none; pointer-events: none;
+        }
+        .m-btn {
+            position: absolute; background: rgba(255,255,255,0.2) !important; 
+            border: 1px solid rgba(255,255,255,0.4) !important;
+            border-radius: 50%; pointer-events: auto; display: flex; 
+            align-items: center; justify-content: center; color: white; 
+            -webkit-tap-highlight-color: transparent;
+        }
+        #m-walk { left: 30px; width: 85px; height: 85px; font-weight: bold; }
+        #m-jump { right: 30px; width: 85px; height: 85px; font-weight: bold; }
+
+        #chat-container {
+            position: fixed; left: 20px; bottom: 80px; z-index: 1500;
+            width: 280px; background: rgba(0, 0, 0, 0.85); border-radius: 15px;
+            padding: 15px; border: 1px solid rgba(255,255,255,0.2); display: none;
+        }
+        #chat-messages { height: 150px; overflow-y: auto; color: white; font-family: sans-serif; font-size: 13px; margin-bottom: 8px; }
+        .chat-input-row { display: flex; gap: 5px; }
+        #chat-input { flex-grow: 1; padding: 8px; border-radius: 5px; border: none; background: rgba(255,255,255,0.2); color: white; }
+        #chat-send { padding: 8px 15px; cursor: pointer; border-radius: 5px; border: none; background: #fff; color: #000; font-weight: bold; }
+
+        .iyakan-toggle {
+            position: fixed; left: 20px; bottom: 20px; z-index: 1501;
+            padding: 12px 25px; background: #1a1c23; color: white; border: 1px solid #333;
+            border-radius: 10px; cursor: pointer; font-weight: bold;
+        }
+
+        #video-container {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 6000;
+        }
+        video { width: 100%; height: 100%; object-fit: contain; }
+        #skip-btn {
+            display: none; position: fixed; bottom: 50px; right: 50px;
+            padding: 15px 35px; background: white; color: black; font-weight: bold; border-radius: 8px; cursor: pointer; z-index: 6100;
+        }
+
+        /* FIXED CREDITS: LOCKED SOLID BLACK */
+        #credits {
+            position: fixed !important; bottom: 20px !important; right: 20px !important;
+            background-color: #000000 !important; 
+            color: #ffffff !important;
+            padding: 10px 15px !important; border-radius: 50px !important; 
+            font-size: 13px !important; text-decoration: none !important; 
+            z-index: 1500 !important; border: 1px solid #444 !important;
+            display: block !important; font-family: sans-serif !important;
+            transition: none !important;
+        }
+        /* No color change on hover/click */
+        #credits:hover, #credits:active, #credits:visited, #credits:focus {
+            background-color: #000000 !important;
+            color: #ffffff !important;
+            text-decoration: none !important;
+            outline: none !important;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="name-overlay">
+        <h1 style="margin-bottom: 10px;">PRO OBBY CHALLENGE</h1>
+        <p style="color: #aaa;">World Ranking Server #1</p>
+        <input type="text" id="user-name-input" placeholder="What's your name?">
+        <button class="start-btn" onclick="saveName()">ENTER!</button>
+    </div>
+
+    <div id="menu">
+        <h1>CHOOSE YOUR CHARACTER</h1>
+        <div class="options">
+            <div class="card" onclick="startGame('boy')" id="boy-card">
+                <div class="char-icon">
+                    <div class="head-part"><div class="hair-boy"></div></div>
+                    <div class="body-part"></div>
+                </div>
+                <h2>MALE</h2>
+            </div>
+            <div class="card" onclick="startGame('girl')" id="girl-card">
+                <div class="char-icon">
+                    <div class="head-part"><div class="hair-girl"></div></div>
+                    <div class="body-part" id="girl-shirt"></div>
+                </div>
+                <h2>FEMALE</h2>
+            </div>
+        </div>
+    </div>
+
+    <div id="mobile-controls">
+        <div id="m-walk" class="m-btn">WALK</div>
+        <div id="m-jump" class="m-btn">JUMP</div>
+    </div>
+
+    <button class="iyakan-toggle" onclick="toggleChat()">💬 Open Chat</button>
+    <div id="chat-container">
+        <div style="color: #ffcc00; font-weight: bold; margin-bottom: 10px; border-bottom: 1px solid #444;">LIVE SERVER CHAT</div>
+        <div id="chat-messages"></div>
+        <div class="chat-input-row">
+            <input type="text" id="chat-input" placeholder="Type a message...">
+            <button id="chat-send" onclick="sendMsg()">Send</button>
+        </div>
+    </div>
+
+    <div id="video-container">
+        <video id="death-video" playsinline></video>
+        <div id="skip-btn" onclick="respawnPlayer()">SKIP VIDEO ➔</div>
+    </div>
+
+    <a href="https://www.instagram.com/_angelonotfound/" target="_blank" id="credits">Developed by: _angelonotfound</a>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+    <script>
+        const firebaseConfig = { databaseURL: "https://mytrollobby-default-rtdb.asia-southeast1.firebasedatabase.app/" };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        let myUsername = "Guest", scene, camera, renderer, player, vy = 0, jumping = false, dead = false;
+        let platforms = [], spinners = [], keys = {}, walkCycle = 0, checkpoint = new THREE.Vector3(0, 5, 0);
+        let mForward = false;
+        const trollVideos = ['relapse.mp4', 'relapse1.mp4', 'relapse2.mp4', 'relapse3.mp4'];
+
+        function saveName() {
+            const input = document.getElementById('user-name-input');
+            if(input.value.trim()){
+                myUsername = input.value.trim();
+                document.getElementById('name-overlay').style.display = 'none';
+                document.getElementById('menu').style.display = 'flex';
+            }
+        }
+
+        function toggleChat() {
+            const box = document.getElementById('chat-container');
+            box.style.display = (box.style.display === 'none') ? 'block' : 'none';
+        }
+
+        function sendMsg() {
+            const input = document.getElementById('chat-input');
+            if(input.value.trim()){
+                db.ref('chat').push().set({ name: myUsername, msg: input.value });
+                input.value = '';
+            }
+        }
+
+        db.ref('chat').limitToLast(15).on('child_added', s => {
+            const data = s.val();
+            const d = document.createElement('div');
+            d.innerHTML = `<b style="color: #00ff00;">${data.name}:</b> ${data.msg}`;
+            document.getElementById('chat-messages').appendChild(d);
+            document.getElementById('chat-messages').scrollTop = document.getElementById('chat-messages').scrollHeight;
+        });
+
+        const walkBtn = document.getElementById('m-walk');
+        const jumpBtn = document.getElementById('m-jump');
+
+        walkBtn.addEventListener('pointerdown', (e) => { e.preventDefault(); mForward = true; });
+        window.addEventListener('pointerup', () => { mForward = false; });
+        jumpBtn.addEventListener('pointerdown', (e) => { 
+            e.preventDefault(); 
+            if(!jumping) { vy = 0.25; jumping = true; }
+        });
+
+        function createHuman(gender) {
+            const group = new THREE.Group();
+            const skin = new THREE.MeshStandardMaterial({ color: 0xffdbac });
+            const clothes = new THREE.MeshStandardMaterial({ color: gender === 'boy' ? 0x1e63b3 : 0xd64a8a });
+            const hairMat = new THREE.MeshStandardMaterial({ color: gender === 'boy' ? 0x222222 : 0x5c3b2e });
+
+            const torso = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.9, 0.4), clothes);
+            torso.position.y = 1.1; group.add(torso);
+            const head = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.55, 0.55), skin);
+            head.position.y = 1.85; group.add(head);
+            const hair = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.2, 0.6), hairMat);
+            hair.position.y = 2.15; group.add(hair);
+            const armGeo = new THREE.BoxGeometry(0.25, 0.7, 0.25);
+            group.lArm = new THREE.Mesh(armGeo, skin); group.lArm.position.set(-0.5, 1.1, 0); group.add(group.lArm);
+            group.rArm = new THREE.Mesh(armGeo, skin); group.rArm.position.set(0.5, 1.1, 0); group.add(group.rArm);
+            const legGeo = new THREE.BoxGeometry(0.3, 0.7, 0.3);
+            group.lLeg = new THREE.Mesh(legGeo, clothes); group.lLeg.position.set(-0.2, 0.35, 0); group.add(group.lLeg);
+            group.rLeg = new THREE.Mesh(legGeo, clothes); group.rLeg.position.set(0.2, 0.35, 0); group.add(group.rLeg);
+            return group;
+        }
+
+        function startGame(gender) {
+            document.getElementById('menu').style.display = 'none';
+            document.getElementById('mobile-controls').style.display = 'block';
+            init(gender);
+        }
+
+        function init(gender) {
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x87CEEB);
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            document.body.appendChild(renderer.domElement);
+            scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+            const light = new THREE.DirectionalLight(0xffffff, 1);
+            light.position.set(5, 15, 5); scene.add(light);
+
+            player = createHuman(gender);
+            player.position.copy(checkpoint);
+            scene.add(player);
+
+            buildLevel(); 
+            animate();
+        }
+
+        function buildLevel() {
+            const add = (x, y, z, w, d, c = 0x444444, type = "static") => {
+                const m = new THREE.Mesh(new THREE.BoxGeometry(w, 0.5, d), new THREE.MeshStandardMaterial({ color: c }));
+                m.position.set(x, y, z);
+                m.userData = { type, initialX: x };
+                if(type === "invisible") { m.material.transparent = true; m.material.opacity = 0.1; }
+                scene.add(m); platforms.push(m);
+            };
+
+            add(0, 0, 0, 10, 10);
+            add(0, 0, -15, 4, 4, 0xffff00, "moving");
+            add(0, 0, -35, 6, 6, 0x00ff00, "checkpoint");
+            add(0, -0.5, -55, 12, 20, 0xff0000, "lava");
+            add(-2, 0, -48, 1.5, 1.5, 0xffffff);
+            add(2, 0, -55, 1.5, 1.5, 0xffffff);
+            add(-2, 0, -62, 1.5, 1.5, 0xffffff);
+            add(0, 0, -75, 4, 4, 0x888888, "fake");
+            add(5, 0, -75, 4, 4, 0x444444);
+            add(0, 0, -90, 6, 6, 0x00ff00, "checkpoint");
+            add(0, 0, -110, 2, 20, 0xffffff, "invisible"); 
+            for(let i=0; i<2; i++) {
+                const g = new THREE.Group(); g.position.set(0, 1.0, -135 - (i*10));
+                const b = new THREE.Mesh(new THREE.BoxGeometry(10, 0.3, 0.3), new THREE.MeshStandardMaterial({color: 0xff0000}));
+                g.add(b); scene.add(g); spinners.push(g);
+                add(0, 0, g.position.z, 5, 5);
+            }
+            add(0, 0, -165, 10, 10, 0xffd700, "finish");
+        }
+
+        function animate() {
+            if (dead) return;
+            requestAnimationFrame(animate);
+
+            let isMoving = false;
+            if (keys['KeyW'] || keys['ArrowUp'] || mForward) { player.position.z -= 0.2; isMoving = true; }
+            if (keys['KeyS'] || keys['ArrowDown']) { player.position.z += 0.2; isMoving = true; }
+            if (keys['KeyA'] || keys['ArrowLeft']) { player.position.x -= 0.2; isMoving = true; }
+            if (keys['KeyD'] || keys['ArrowRight']) { player.position.x += 0.2; isMoving = true; }
+            if ((keys['Space'] || keys['KeyK']) && !jumping) { vy = 0.25; jumping = true; }
+
+            if (isMoving && !jumping) {
+                walkCycle += 0.2;
+                player.lLeg.rotation.x = Math.sin(walkCycle) * 0.5;
+                player.rLeg.rotation.x = Math.cos(walkCycle) * 0.5;
+                player.lArm.rotation.x = Math.cos(walkCycle) * 0.5;
+                player.rArm.rotation.x = Math.sin(walkCycle) * 0.5;
+            }
+
+            vy -= 0.01; player.position.y += vy;
+
+            platforms.forEach(p => {
+                if(p.userData.type === "moving") p.position.x = p.userData.initialX + Math.sin(Date.now()*0.002)*7;
+                let dx = Math.abs(player.position.x - p.position.x), dz = Math.abs(player.position.z - p.position.z);
+                if (dx < p.geometry.parameters.width/2+0.3 && dz < p.geometry.parameters.depth/2+0.3 &&
+                    player.position.y <= p.position.y+1.0 && player.position.y >= p.position.y) {
+                    if(p.userData.type === "fake") p.position.y -= 0.15;
+                    else if(p.userData.type === "lava") die();
+                    else if(p.userData.type === "checkpoint") { checkpoint.set(p.position.x, p.position.y+5, p.position.z); p.material.color.set(0x0000ff); }
+                    else if(p.userData.type === "finish") { alert("CONGRATS!"); location.reload(); }
+                    else { player.position.y = p.position.y+1.0; vy = 0; jumping = false; }
+                }
+            });
+
+            spinners.forEach(s => { s.rotation.y += 0.1; if(player.position.distanceTo(s.position) < 4) die(); });
+
+            if (player.position.y < -20) die();
+            camera.position.lerp(new THREE.Vector3(player.position.x, player.position.y + 8, player.position.z + 12), 0.1);
+            camera.lookAt(player.position);
+            renderer.render(scene, camera);
+        }
+
+        function die() {
+            if(dead) return; dead = true;
+            const container = document.getElementById('video-container');
+            const vid = document.getElementById('death-video');
+            vid.src = trollVideos[Math.floor(Math.random() * trollVideos.length)];
+            container.style.display = 'block';
+            vid.play().catch(e => { console.log("Needs touch"); });
+            setTimeout(() => { document.getElementById('skip-btn').style.display = 'block'; }, 4000);
+        }
+
+        function respawnPlayer() {
+            document.getElementById('video-container').style.display = 'none';
+            document.getElementById('skip-btn').style.display = 'none';
+            player.position.copy(checkpoint);
+            vy = 0; dead = false;
+            animate();
+        }
+
+        window.addEventListener('keydown', e => keys[e.code] = true);
+        window.addEventListener('keyup', e => keys[e.code] = false);
+    </script>
+</body>
+</html>
